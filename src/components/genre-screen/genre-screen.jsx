@@ -10,6 +10,9 @@ class GenreScreen extends PureComponent {
     };
   }
   render() {
+    const userAnswer = this.state.answers;
+    const {question, onAnswer} = this.props;
+    const {genre, answers} = question;
     return (
       <section className="game game--genre">
         <header className="game__header">
@@ -30,51 +33,31 @@ class GenreScreen extends PureComponent {
         </header>
 
         <section className="game__screen">
-          <h2 className="game__title">Выберите инди-рок треки</h2>
-          <form className="game__tracks">
-            <div className="track">
-              <button className="track__button track__button--play" type="button"></button>
-              <div className="track__status">
-                <audio></audio>
-              </div>
-              <div className="game__answer">
-                <input className="game__input visually-hidden" type="checkbox" name="answer" value="answer-1" id="answer-1"/>
-                <label className="game__check" htmlFor="answer-1">Отметить</label>
-              </div>
-            </div>
+          <h2 className="game__title">Выберите {genre} треки</h2>
+          <form className="game__tracks"
+            onSubmit = {(evt) =>{
+              evt.preventDefault();
+              onAnswer(question, this.state.answers);
+            }}>
 
-            <div className="track">
-              <button className="track__button track__button--play" type="button"></button>
-              <div className="track__status">
-                <audio></audio>
+            {answers.map((answer, index) => (
+              <div className="track" key = {`${index}${answer.genre}-${answer.src}`}>
+                <button className="track__button track__button--play" type="button"></button>
+                <div className="track__status">
+                  <audio src={answer.src}></audio>
+                </div>
+                <div className="game__answer">
+                  <input className="game__input visually-hidden" type="checkbox" name="answer" value={`answer-${index}`} id={`answer-${index}`}
+                    checked={userAnswer[index]}
+                    onChange = {(evt) => {
+                      this.setState({answers: [...userAnswer.slice(0, index), evt.target.checked, ...userAnswer.slice(index + 1)]});
+                    }
+                    }
+                  />
+                  <label className="game__check" htmlFor={`answer-${index}`}>Отметить</label>
+                </div>
               </div>
-              <div className="game__answer">
-                <input className="game__input visually-hidden" type="checkbox" name="answer" value="answer-1" id="answer-2"/>
-                <label className="game__check" htmlFor="answer-2">Отметить</label>
-              </div>
-            </div>
-
-            <div className="track">
-              <button className="track__button track__button--pause" type="button"></button>
-              <div className="track__status">
-                <audio></audio>
-              </div>
-              <div className="game__answer">
-                <input className="game__input visually-hidden" type="checkbox" name="answer" value="answer-1" id="answer-3"/>
-                <label className="game__check" htmlFor="answer-3">Отметить</label>
-              </div>
-            </div>
-
-            <div className="track">
-              <button className="track__button track__button--play" type="button"></button>
-              <div className="track__status">
-                <audio></audio>
-              </div>
-              <div className="game__answer">
-                <input className="game__input visually-hidden" type="checkbox" name="answer" value="answer-1" id="answer-4"/>
-                <label className="game__check" htmlFor="answer-4">Отметить</label>
-              </div>
-            </div>
+            ))}
 
             <button className="game__submit button" type="submit">Ответить</button>
           </form>
@@ -92,7 +75,7 @@ GenreScreen.propTypes = {
     answers: PropTypes.arrayOf(PropTypes.shape({
       src: PropTypes.string.isRequired,
       genre: PropTypes.string.isRequired,
-    }))
+    })).isRequired,
   }).isRequired
 };
 
